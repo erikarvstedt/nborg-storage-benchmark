@@ -20,6 +20,7 @@ vmRun() {(
     echo $qemuPID > $tmpDir/qemuPID
 
     # Wait until VM has booted
+    set +x
     while read line; do
         echo "$line"
         if [[ ${line} == *"nixos login"* ]]; then
