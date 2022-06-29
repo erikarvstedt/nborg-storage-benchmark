@@ -41,14 +41,18 @@ in
     fsType = "zfs";
   };
 
+  # Don't automount ZFS datasets, as this conflicts with our manual mount setup
+  # through `fileSystems`
+  systemd.services.zfs-mount.enable = false;
+
   # TODO-EXTERNAL:
   # Remove the ZFS filesystem definitions when
   # https://github.com/NixOS/nixpkgs/issues/62644 has been implemented
   fileSystems."/nix" = {
     device = "rpool/nix";
     fsType = "zfs";
-    # Required to make this mount compatible with ZFS's auto-mount mechanism
-    # for datasets with a non-legacy `mountpoint`.
+    # Allow mounting datasets with `mount.zfs` that are not marked with
+    # `mountpoint=legacy`
     options = [ "zfsutil" ];
   };
 
