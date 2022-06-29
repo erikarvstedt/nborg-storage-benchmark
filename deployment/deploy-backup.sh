@@ -21,6 +21,7 @@ rm -rf $TMPDIR
 #―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 # 2. Init borg backup repo on seedhost
 
+# Run the following commands in a nix shell
 nix shell nixpkgs/29399e5ad1660668b61247c99894fc2fb97b4e74#borgbackup
 
 # Ensure borg version is >= 1.2.1
