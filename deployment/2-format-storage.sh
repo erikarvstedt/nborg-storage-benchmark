@@ -9,12 +9,18 @@ bootSize=512MiB
 swapSize=${swapSize:-32GiB}
 
 # Remount already formatted storage
+mountStorage() {
+    if ! zfs get type rpool &>/dev/null; then
+        zpool import -f -N rpool
+    fi
+    mount -t zfs -o x-mount.mkdir rpool/root /mnt
+    mount -t zfs -o x-mount.mkdir rpool/nix /mnt/nix
+    mount -o x-mount.mkdir ${disk1}2 /mnt/boot1
+    mount -o x-mount.mkdir ${disk2}2 /mnt/boot2
+}
+
 if [[ ${1:-} == remount ]]; then
-    zpool import -f -N rpool
-    mount -t zfs -o zfsutil,x-mount.mkdir rpool/root /mnt
-    mount -t zfs -o zfsutil rpool/nix /mnt/nix
-    mount ${disk1}2 /mnt/boot1
-    mount ${disk2}2 /mnt/boot2
+    mountStorage
     exit
 fi
 
@@ -47,9 +53,6 @@ mkswap -L swap2 ${disk2}3
 # Enable UTF-8 normalization for file names
 #
 zpool create -f \
-  -R /mnt \
-  -O canmount=off \
-  -O mountpoint=none \
   -o ashift=12 \
   -O acltype=posixacl \
   -O xattr=sa \
@@ -59,11 +62,9 @@ zpool create -f \
   -O dnodesize=auto \
   rpool mirror ${disk1}4 ${disk2}4
 
-zfs create -o mountpoint=/ -o canmount=on rpool/root
-zfs create -o mountpoint=/nix -o canmount=on rpool/nix
-zfs create -o refreservation=1G -o mountpoint=none -o canmount=off rpool/reserved
+zfs create -o mountpoint=legacy rpool/root
+zfs create -o mountpoint=legacy rpool/nix
+zfs create -o mountpoint=none -o refreservation=1G rpool/reserved
 zfs set com.sun:auto-snapshot=true rpool/root
 
-mkdir -p /mnt/{boot1,boot2}
-mount ${disk1}2 /mnt/boot1
-mount ${disk2}2 /mnt/boot2
+mountStorage
