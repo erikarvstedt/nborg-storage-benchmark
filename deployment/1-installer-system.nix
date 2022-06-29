@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }: let
+{ config, lib, pkgs, ... }: let
   baseSystem = pkgs.nixos ../base.nix;
 in {
   users.users.root.password = "a";
@@ -20,4 +20,6 @@ in {
   };
   users.users.root.openssh.authorizedKeys.keys =
     baseSystem.config.users.users.root.openssh.authorizedKeys.keys;
+
+  system.stateVersion = config.system.nixos.release;
 }
