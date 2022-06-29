@@ -1,13 +1,14 @@
-{ config, lib, pkgs, ... }: let
+{ config, lib, pkgs, ... }:
+with lib;
+let
   baseSystem = pkgs.nixos ../base.nix;
 in {
-  users.users.root.password = "a";
-  services.getty.autologinUser = lib.mkForce "root";
-
   # Use same the hostid as the final system so that the zfs pool
   # can be automatically imported
   networking.hostId = baseSystem.config.networking.hostId;
   boot.supportedFilesystems = [ "zfs" ];
+
+  time.timeZone = "UTC";
 
   environment.systemPackages = with pkgs; [
     gptfdisk
@@ -18,8 +19,12 @@ in {
     enable = true;
     passwordAuthentication = false;
   };
-  users.users.root.openssh.authorizedKeys.keys =
-    baseSystem.config.users.users.root.openssh.authorizedKeys.keys;
+  users.users.root = let
+    base = baseSystem.config.users.users.root;
+  in {
+    openssh.authorizedKeys.keys = base.openssh.authorizedKeys.keys;
+    hashedPassword = base.hashedPassword;
+  };
 
   system.stateVersion = config.system.nixos.release;
 }

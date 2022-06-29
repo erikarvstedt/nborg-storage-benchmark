@@ -11,42 +11,28 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
+
+        installerSystem = nixpkgs-kexec.lib.nixosSystem {
+          inherit system;
+          modules = [ ./1-installer-system-kexec.nix ];
+        };
       in {
-        packages = rec {
+        packages = {
 
           installerSystemVM = (import "${nixpkgs}/nixos" {
             inherit system;
-            configuration = {
+            configuration = { lib, ...}: {
               imports = [ ./1-installer-system.nix ];
+              users.users.root.password = "a";
+              services.getty.autologinUser = lib.mkForce "root";
               virtualisation.graphics = false;
-              environment.etc.base-system.source = baseSystem;
+              environment.etc.base-system.source = self.packages.${system}.baseSystem;
             };
           }).vm;
 
-          installerSystemKexec = (nixpkgs-kexec.lib.nixosSystem {
-            inherit system;
-            modules = [
-              ({ modulesPath, ... }: {
-                imports = [
-                  ./1-installer-system.nix
-                  "${modulesPath}/installer/kexec/kexec-boot.nix"
-                ];
-                services.openssh.hostKeys = [
-                  {
-                    path = "/run/keys/ssh-host-key";
-                    type = "ed25519";
-                  }
-                ];
-                boot.kernelParams = [
-                  # Allows certain forms of remote access, if the hardware is setup right
-                  "console=ttyS0,115200"
-                  # Reboot the machine upon fatal boot issues
-                  "panic=30"
-                  "boot.panic_on_fail"
-                ];
-              })
-            ];
-          }).config.system.build.kexecBoot;
+          installerSystemKexec = installerSystem.config.system.build.kexecBoot;
+
+          installerSystem = installerSystem.config.system.build.toplevel;
 
           baseSystem = (nixpkgs.lib.nixosSystem {
             inherit system;
