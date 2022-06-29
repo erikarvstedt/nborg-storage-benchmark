@@ -120,6 +120,8 @@ deployBaseSystem
 
 # Reboot
 ssh nixbitcoin.org reboot
+# Close ControlMaster
+ssh nixbitcoin.org -O exit
 
 # Check login
 ssh nixbitcoin.org :
