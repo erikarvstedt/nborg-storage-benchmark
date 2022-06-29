@@ -92,8 +92,12 @@ ssh nixbitcoin.org :
 
 # Format storage
 <2-format-storage.sh ssh nixbitcoin.org 'bash -s'
+#
 # Variant for testing on smaller servers: Override swapSize
 # <2-format-storage.sh ssh nixbitcoin.org 'swapSize=1GiB bash -s'
+#
+# Remount already formatted storage
+# <2-format-storage.sh ssh nixbitcoin.org 'bash -s remount'
 
 # Optional: Generate config to update ../hardware.nix
 makeConfig() {(
@@ -108,11 +112,11 @@ deployBaseSystem() {(
   nix build .#packages.x86_64-linux.baseSystem --out-link /tmp/deploy-nixbitcoinorg/base-system
   nix copy --to ssh://nixbitcoin.org /tmp/deploy-nixbitcoinorg/base-system
   ssh nixbitcoin.org "nixos-install --system $(realpath /tmp/deploy-nixbitcoinorg/base-system) --root /mnt --no-root-passwd"
+  # Deploy SSH host key
+  gpg --decrypt ../secrets/client-side/ssh-host-key.gpg 2>/dev/null | \
+    ssh nixbitcoin.org 'install -m 600 <(cat) /mnt/etc/ssh/ssh_host_ed25519_key'
 )}
 deployBaseSystem
-
-# Deploy SSH host key
-gpg --decrypt ../secrets/client-side/ssh-host-key.gpg 2>/dev/null | ssh nixbitcoin.org 'install -m 600 <(cat) /mnt/etc/ssh/ssh_host_ed25519_key'
 
 # Reboot
 ssh nixbitcoin.org reboot
@@ -121,6 +125,7 @@ ssh nixbitcoin.org reboot
 ssh nixbitcoin.org :
 
 rm -rf /tmp/deploy-nixbitcoinorg
+# Now delete/edit entries in ~/.ssh/config
 
 #―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 # Optional: Restore backups
