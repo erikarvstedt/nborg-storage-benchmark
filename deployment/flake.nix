@@ -19,16 +19,21 @@
       in {
         packages = {
 
-          installerSystemVM = (import "${nixpkgs}/nixos" {
+          installerSystemVM = (nixpkgs.lib.nixosSystem {
             inherit system;
-            configuration = { lib, ...}: {
-              imports = [ ./1-installer-system.nix ];
-              users.users.root.password = "a";
-              services.getty.autologinUser = lib.mkForce "root";
-              virtualisation.graphics = false;
-              environment.etc.base-system.source = self.packages.${system}.baseSystem;
-            };
-          }).vm;
+            modules = [
+              ({ lib, modulesPath, ...}: {
+                imports = [
+                  ./1-installer-system.nix
+                  "${modulesPath}/virtualisation/qemu-vm.nix"
+                ];
+                users.users.root.password = "a";
+                services.getty.autologinUser = lib.mkForce "root";
+                virtualisation.graphics = false;
+                environment.etc.base-system.source = self.packages.${system}.baseSystem;
+              })
+            ];
+          }).config.system.build.vm;
 
           installerSystemKexec = installerSystem.config.system.build.kexecBoot;
 
