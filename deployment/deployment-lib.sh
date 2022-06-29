@@ -22,6 +22,6 @@ copyKexec() {(
     install -m 600 <(gpg --decrypt ../secrets/client-side/ssh-host-key.gpg 2>/dev/null) \
         $initrdDir/.initrd-secrets/run/keys/ssh-host-key
     # Append to initrd. The host key will be available at /run/keys/ssh-host-key in the booted system
-    (cd $XDG_RUNTIME_DIR/nixos-deploy-tmp && find | cpio -o -H newc -R +0:+0) | gzip -9 | ssh nborg-installer 'cat >> /tmp/initrd.gz'
+    (cd $initrdDir && find | cpio -o -H newc -R +0:+0) | gzip -9 | ssh nborg-installer 'cat >> /tmp/initrd.gz'
     rm -rf $initrdDir
 )}
