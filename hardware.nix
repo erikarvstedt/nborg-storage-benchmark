@@ -78,4 +78,7 @@ in
       { path = "/boot2"; devices = [ "/dev/sdb" ]; }
     ];
   };
+
+  # Should be 1/4 of total system RAM
+  services.postgresql.settings.shared_buffers = "8GB";
 }
