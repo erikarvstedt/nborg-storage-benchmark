@@ -11,10 +11,8 @@ swapSize=${swapSize:-32GiB}
 # Remount already formatted storage
 if [[ ${1:-} == remount ]]; then
     zpool import -f -N rpool
-    zfs set mountpoint=/mnt rpool/root
-    zfs set mountpoint=/mnt/nix rpool/nix
-    zfs mount rpool/root
-    zfs mount rpool/nix
+    mount -t zfs -o zfsutil,x-mount.mkdir rpool/root /mnt
+    mount -t zfs -o zfsutil rpool/nix /mnt/nix
     mount ${disk1}2 /mnt/boot1
     mount ${disk2}2 /mnt/boot2
     exit
