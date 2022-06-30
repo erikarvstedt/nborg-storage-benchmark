@@ -16,6 +16,17 @@
           inherit system;
           modules = [ ./1-installer-system-kexec.nix ];
         };
+
+        mkBenchmarkSystem = description: config:
+          (nixpkgs-kexec.lib.nixosSystem {
+            inherit system;
+            modules = [
+              ./benchmark-system.nix
+              config
+            ];
+          }).config.system.build.toplevel // {
+            inherit description;
+          };
       in {
         packages = {
 
@@ -43,6 +54,19 @@
             inherit system;
             modules = [ ../base.nix ];
           }).config.system.build.toplevel;
-        };
+        }
+        // (with nixpkgs-kexec.lib; {
+          benchmark1 = mkBenchmarkSystem "postgresql 11, shared_buffers: default (128 MiB) [the current setup on nixbitcoin.org]" {
+            system.stateVersion = mkForce "20.09";
+          };
+          benchmark2 = mkBenchmarkSystem "postgresql 11, shared_buffers: 8 GiB" {
+            services.postgresql.settings.shared_buffers = "8GB";
+            system.stateVersion = mkForce "20.09";
+          };
+          benchmark3 = mkBenchmarkSystem "postgresql 14, shared_buffers: 8 GiB" {
+            services.postgresql.settings.shared_buffers = "8GB";
+            system.stateVersion = mkForce "22.05";
+          };
+        });
       });
 }
