@@ -1,4 +1,4 @@
-{ lib, modulesPath, ... }:
+{ pkgs, lib, modulesPath, ... }:
 with lib;
 {
   imports = [
@@ -22,11 +22,14 @@ with lib;
       type = "ed25519";
     }
   ];
-  boot.kernelParams = [
-    # Allows certain forms of remote access, if the hardware is setup right
-    "console=ttyS0,115200"
-    # Reboot the machine upon fatal boot issues
-    "panic=30"
-    "boot.panic_on_fail"
+  # Allow serial device access
+  boot.kernelParams = let
+    # Copied from nixpkgs/nixos/lib/qemu-common.nix
+    serialDevice =
+      if pkgs.stdenv.hostPlatform.isx86 || pkgs.stdenv.hostPlatform.isRiscV then "ttyS0"
+      else if (with pkgs.stdenv.hostPlatform; isAarch32 || isAarch64 || isPower) then "ttyAMA0"
+      else throw "Unknown serial device for system '${pkgs.stdenv.hostPlatform.system}'";
+  in [
+    "console=${serialDevice},115200n8"
   ];
 }
