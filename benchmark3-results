@@ -1,0 +1,1082 @@
+postgresql 14, shared_buffers: 8 GiB
++ pgbench_zfs
++ set -euo pipefail
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
+db mount is already disabled
++ [[ ! -n '' ]]
++ echo 'db mount is already disabled'
++ return
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ createDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs create -o mountpoint=legacy -o canmount=on rpool/root/db
++ enableDbZfs
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount -t zfs -o x-mount.mkdir rpool/root/db /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.06 s, remaining 2.81 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.19 s, remaining 4.62 s)
+300000 of 5000000 tuples (6%) done (elapsed 0.25 s, remaining 3.95 s)
+400000 of 5000000 tuples (8%) done (elapsed 0.40 s, remaining 4.65 s)
+500000 of 5000000 tuples (10%) done (elapsed 0.54 s, remaining 4.90 s)
+600000 of 5000000 tuples (12%) done (elapsed 0.61 s, remaining 4.44 s)
+700000 of 5000000 tuples (14%) done (elapsed 0.75 s, remaining 4.63 s)
+800000 of 5000000 tuples (16%) done (elapsed 0.84 s, remaining 4.39 s)
+900000 of 5000000 tuples (18%) done (elapsed 0.98 s, remaining 4.47 s)
+1000000 of 5000000 tuples (20%) done (elapsed 1.08 s, remaining 4.31 s)
+1100000 of 5000000 tuples (22%) done (elapsed 1.20 s, remaining 4.27 s)
+1200000 of 5000000 tuples (24%) done (elapsed 1.38 s, remaining 4.37 s)
+1300000 of 5000000 tuples (26%) done (elapsed 1.54 s, remaining 4.37 s)
+1400000 of 5000000 tuples (28%) done (elapsed 1.60 s, remaining 4.11 s)
+1500000 of 5000000 tuples (30%) done (elapsed 1.74 s, remaining 4.07 s)
+1600000 of 5000000 tuples (32%) done (elapsed 1.82 s, remaining 3.86 s)
+1700000 of 5000000 tuples (34%) done (elapsed 1.99 s, remaining 3.86 s)
+1800000 of 5000000 tuples (36%) done (elapsed 2.17 s, remaining 3.85 s)
+1900000 of 5000000 tuples (38%) done (elapsed 2.23 s, remaining 3.64 s)
+2000000 of 5000000 tuples (40%) done (elapsed 2.58 s, remaining 3.86 s)
+2100000 of 5000000 tuples (42%) done (elapsed 2.72 s, remaining 3.75 s)
+2200000 of 5000000 tuples (44%) done (elapsed 2.78 s, remaining 3.54 s)
+2300000 of 5000000 tuples (46%) done (elapsed 2.93 s, remaining 3.44 s)
+2400000 of 5000000 tuples (48%) done (elapsed 3.00 s, remaining 3.25 s)
+2500000 of 5000000 tuples (50%) done (elapsed 3.12 s, remaining 3.12 s)
+2600000 of 5000000 tuples (52%) done (elapsed 3.25 s, remaining 3.00 s)
+2700000 of 5000000 tuples (54%) done (elapsed 3.41 s, remaining 2.91 s)
+2800000 of 5000000 tuples (56%) done (elapsed 3.47 s, remaining 2.73 s)
+2900000 of 5000000 tuples (58%) done (elapsed 3.62 s, remaining 2.62 s)
+3000000 of 5000000 tuples (60%) done (elapsed 3.72 s, remaining 2.48 s)
+3100000 of 5000000 tuples (62%) done (elapsed 3.84 s, remaining 2.35 s)
+3200000 of 5000000 tuples (64%) done (elapsed 3.97 s, remaining 2.24 s)
+3300000 of 5000000 tuples (66%) done (elapsed 4.13 s, remaining 2.13 s)
+3400000 of 5000000 tuples (68%) done (elapsed 4.19 s, remaining 1.97 s)
+3500000 of 5000000 tuples (70%) done (elapsed 4.33 s, remaining 1.86 s)
+3600000 of 5000000 tuples (72%) done (elapsed 4.42 s, remaining 1.72 s)
+3700000 of 5000000 tuples (74%) done (elapsed 4.54 s, remaining 1.60 s)
+3800000 of 5000000 tuples (76%) done (elapsed 4.68 s, remaining 1.48 s)
+3900000 of 5000000 tuples (78%) done (elapsed 4.73 s, remaining 1.34 s)
+4000000 of 5000000 tuples (80%) done (elapsed 4.89 s, remaining 1.22 s)
+4100000 of 5000000 tuples (82%) done (elapsed 5.02 s, remaining 1.10 s)
+4200000 of 5000000 tuples (84%) done (elapsed 5.08 s, remaining 0.97 s)
+4300000 of 5000000 tuples (86%) done (elapsed 5.24 s, remaining 0.85 s)
+4400000 of 5000000 tuples (88%) done (elapsed 5.41 s, remaining 0.74 s)
+4500000 of 5000000 tuples (90%) done (elapsed 5.49 s, remaining 0.61 s)
+4600000 of 5000000 tuples (92%) done (elapsed 5.83 s, remaining 0.51 s)
+4700000 of 5000000 tuples (94%) done (elapsed 5.99 s, remaining 0.38 s)
+4800000 of 5000000 tuples (96%) done (elapsed 6.12 s, remaining 0.26 s)
+4900000 of 5000000 tuples (98%) done (elapsed 6.26 s, remaining 0.13 s)
+5000000 of 5000000 tuples (100%) done (elapsed 6.32 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 12.26 s (drop tables 0.00 s, create tables 0.04 s, client-side generate 6.46 s, vacuum 1.39 s, primary keys 4.37 s).
+
+real	0m12.271s
+user	0m0.958s
+sys	0m0.022s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+pgbench (14.3)
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 52017
+latency average = 34.610 ms
+initial connection time = 7.996 ms
+tps = 288.934324 (without initial connection time)
+
+real	3m0.219s
+user	0m2.167s
+sys	0m3.364s
++ pgbench_zfs -o recordsize=8K
++ set -euo pipefail
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE        FSTYPE OPTIONS
+/var/lib/db rpool/root/db zfs    rw,relatime,xattr,posixacl ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs destroy rpool/root/db
++ createDbDataset -o recordsize=8K
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs create -o mountpoint=legacy -o canmount=on -o recordsize=8K rpool/root/db
++ enableDbZfs
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount -t zfs -o x-mount.mkdir rpool/root/db /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.06 s, remaining 2.77 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.59 s, remaining 14.13 s)
+300000 of 5000000 tuples (6%) done (elapsed 1.11 s, remaining 17.33 s)
+400000 of 5000000 tuples (8%) done (elapsed 1.38 s, remaining 15.82 s)
+500000 of 5000000 tuples (10%) done (elapsed 1.43 s, remaining 12.91 s)
+600000 of 5000000 tuples (12%) done (elapsed 1.94 s, remaining 14.20 s)
+700000 of 5000000 tuples (14%) done (elapsed 2.84 s, remaining 17.42 s)
+800000 of 5000000 tuples (16%) done (elapsed 3.74 s, remaining 19.65 s)
+900000 of 5000000 tuples (18%) done (elapsed 4.27 s, remaining 19.45 s)
+1000000 of 5000000 tuples (20%) done (elapsed 4.33 s, remaining 17.32 s)
+1100000 of 5000000 tuples (22%) done (elapsed 4.62 s, remaining 16.38 s)
+1200000 of 5000000 tuples (24%) done (elapsed 5.15 s, remaining 16.31 s)
+1300000 of 5000000 tuples (26%) done (elapsed 5.68 s, remaining 16.18 s)
+1400000 of 5000000 tuples (28%) done (elapsed 6.26 s, remaining 16.10 s)
+1500000 of 5000000 tuples (30%) done (elapsed 6.32 s, remaining 14.75 s)
+1600000 of 5000000 tuples (32%) done (elapsed 6.86 s, remaining 14.59 s)
+1700000 of 5000000 tuples (34%) done (elapsed 7.18 s, remaining 13.94 s)
+1800000 of 5000000 tuples (36%) done (elapsed 8.35 s, remaining 14.85 s)
+1900000 of 5000000 tuples (38%) done (elapsed 9.13 s, remaining 14.90 s)
+2000000 of 5000000 tuples (40%) done (elapsed 9.21 s, remaining 13.82 s)
+2100000 of 5000000 tuples (42%) done (elapsed 10.14 s, remaining 14.00 s)
+2200000 of 5000000 tuples (44%) done (elapsed 10.66 s, remaining 13.56 s)
+2300000 of 5000000 tuples (46%) done (elapsed 10.93 s, remaining 12.83 s)
+2400000 of 5000000 tuples (48%) done (elapsed 11.49 s, remaining 12.45 s)
+2500000 of 5000000 tuples (50%) done (elapsed 11.55 s, remaining 11.55 s)
+2600000 of 5000000 tuples (52%) done (elapsed 12.12 s, remaining 11.19 s)
+2700000 of 5000000 tuples (54%) done (elapsed 12.90 s, remaining 10.99 s)
+2800000 of 5000000 tuples (56%) done (elapsed 13.79 s, remaining 10.83 s)
+2900000 of 5000000 tuples (58%) done (elapsed 14.20 s, remaining 10.28 s)
+3000000 of 5000000 tuples (60%) done (elapsed 14.28 s, remaining 9.52 s)
+3100000 of 5000000 tuples (62%) done (elapsed 15.05 s, remaining 9.23 s)
+3200000 of 5000000 tuples (64%) done (elapsed 15.72 s, remaining 8.84 s)
+3300000 of 5000000 tuples (66%) done (elapsed 16.52 s, remaining 8.51 s)
+3400000 of 5000000 tuples (68%) done (elapsed 17.05 s, remaining 8.03 s)
+3500000 of 5000000 tuples (70%) done (elapsed 17.12 s, remaining 7.34 s)
+3600000 of 5000000 tuples (72%) done (elapsed 17.41 s, remaining 6.77 s)
+3700000 of 5000000 tuples (74%) done (elapsed 18.43 s, remaining 6.48 s)
+3800000 of 5000000 tuples (76%) done (elapsed 19.21 s, remaining 6.07 s)
+3900000 of 5000000 tuples (78%) done (elapsed 19.85 s, remaining 5.60 s)
+4000000 of 5000000 tuples (80%) done (elapsed 19.91 s, remaining 4.98 s)
+4100000 of 5000000 tuples (82%) done (elapsed 20.43 s, remaining 4.49 s)
+4200000 of 5000000 tuples (84%) done (elapsed 20.72 s, remaining 3.95 s)
+4300000 of 5000000 tuples (86%) done (elapsed 21.26 s, remaining 3.46 s)
+4400000 of 5000000 tuples (88%) done (elapsed 21.81 s, remaining 2.97 s)
+4500000 of 5000000 tuples (90%) done (elapsed 21.87 s, remaining 2.43 s)
+4600000 of 5000000 tuples (92%) done (elapsed 22.48 s, remaining 1.95 s)
+4700000 of 5000000 tuples (94%) done (elapsed 23.61 s, remaining 1.51 s)
+4800000 of 5000000 tuples (96%) done (elapsed 23.96 s, remaining 1.00 s)
+4900000 of 5000000 tuples (98%) done (elapsed 24.66 s, remaining 0.50 s)
+5000000 of 5000000 tuples (100%) done (elapsed 24.74 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 36.62 s (drop tables 0.00 s, create tables 0.04 s, client-side generate 25.37 s, vacuum 1.62 s, primary keys 9.60 s).
+
+real	0m36.633s
+user	0m1.024s
+sys	0m0.026s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+pgbench (14.3)
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 77579
+latency average = 23.211 ms
+initial connection time = 9.451 ms
+tps = 430.825896 (without initial connection time)
+
+real	3m0.258s
+user	0m3.169s
+sys	0m4.963s
++ pgbench_zfs -o primarycache=metadata
++ set -euo pipefail
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE        FSTYPE OPTIONS
+/var/lib/db rpool/root/db zfs    rw,relatime,xattr,posixacl ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs destroy rpool/root/db
++ createDbDataset -o primarycache=metadata
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs create -o mountpoint=legacy -o canmount=on -o primarycache=metadata rpool/root/db
++ enableDbZfs
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount -t zfs -o x-mount.mkdir rpool/root/db /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.06 s, remaining 2.72 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.13 s, remaining 3.21 s)
+300000 of 5000000 tuples (6%) done (elapsed 0.26 s, remaining 4.01 s)
+400000 of 5000000 tuples (8%) done (elapsed 0.40 s, remaining 4.62 s)
+500000 of 5000000 tuples (10%) done (elapsed 0.55 s, remaining 4.96 s)
+600000 of 5000000 tuples (12%) done (elapsed 0.61 s, remaining 4.49 s)
+700000 of 5000000 tuples (14%) done (elapsed 0.75 s, remaining 4.62 s)
+800000 of 5000000 tuples (16%) done (elapsed 0.85 s, remaining 4.48 s)
+900000 of 5000000 tuples (18%) done (elapsed 0.97 s, remaining 4.42 s)
+1000000 of 5000000 tuples (20%) done (elapsed 1.11 s, remaining 4.44 s)
+1100000 of 5000000 tuples (22%) done (elapsed 1.25 s, remaining 4.43 s)
+1200000 of 5000000 tuples (24%) done (elapsed 1.31 s, remaining 4.14 s)
+1300000 of 5000000 tuples (26%) done (elapsed 1.39 s, remaining 3.96 s)
+1400000 of 5000000 tuples (28%) done (elapsed 1.52 s, remaining 3.91 s)
+1500000 of 5000000 tuples (30%) done (elapsed 1.67 s, remaining 3.89 s)
+1600000 of 5000000 tuples (32%) done (elapsed 2.05 s, remaining 4.36 s)
+1700000 of 5000000 tuples (34%) done (elapsed 2.29 s, remaining 4.45 s)
+1800000 of 5000000 tuples (36%) done (elapsed 2.38 s, remaining 4.24 s)
+1900000 of 5000000 tuples (38%) done (elapsed 2.44 s, remaining 3.99 s)
+2000000 of 5000000 tuples (40%) done (elapsed 2.57 s, remaining 3.85 s)
+2100000 of 5000000 tuples (42%) done (elapsed 2.75 s, remaining 3.80 s)
+2200000 of 5000000 tuples (44%) done (elapsed 2.93 s, remaining 3.73 s)
+2300000 of 5000000 tuples (46%) done (elapsed 2.99 s, remaining 3.51 s)
+2400000 of 5000000 tuples (48%) done (elapsed 3.14 s, remaining 3.40 s)
+2500000 of 5000000 tuples (50%) done (elapsed 3.23 s, remaining 3.23 s)
+2600000 of 5000000 tuples (52%) done (elapsed 3.34 s, remaining 3.08 s)
+2700000 of 5000000 tuples (54%) done (elapsed 3.49 s, remaining 2.97 s)
+2800000 of 5000000 tuples (56%) done (elapsed 3.54 s, remaining 2.78 s)
+2900000 of 5000000 tuples (58%) done (elapsed 3.68 s, remaining 2.67 s)
+3000000 of 5000000 tuples (60%) done (elapsed 3.75 s, remaining 2.50 s)
+3100000 of 5000000 tuples (62%) done (elapsed 3.91 s, remaining 2.40 s)
+3200000 of 5000000 tuples (64%) done (elapsed 4.03 s, remaining 2.27 s)
+3300000 of 5000000 tuples (66%) done (elapsed 4.09 s, remaining 2.11 s)
+3400000 of 5000000 tuples (68%) done (elapsed 4.24 s, remaining 2.00 s)
+3500000 of 5000000 tuples (70%) done (elapsed 4.37 s, remaining 1.87 s)
+3600000 of 5000000 tuples (72%) done (elapsed 4.46 s, remaining 1.73 s)
+3700000 of 5000000 tuples (74%) done (elapsed 4.58 s, remaining 1.61 s)
+3800000 of 5000000 tuples (76%) done (elapsed 4.72 s, remaining 1.49 s)
+3900000 of 5000000 tuples (78%) done (elapsed 4.77 s, remaining 1.35 s)
+4000000 of 5000000 tuples (80%) done (elapsed 4.92 s, remaining 1.23 s)
+4100000 of 5000000 tuples (82%) done (elapsed 4.99 s, remaining 1.10 s)
+4200000 of 5000000 tuples (84%) done (elapsed 5.13 s, remaining 0.98 s)
+4300000 of 5000000 tuples (86%) done (elapsed 5.48 s, remaining 0.89 s)
+4400000 of 5000000 tuples (88%) done (elapsed 5.84 s, remaining 0.80 s)
+4500000 of 5000000 tuples (90%) done (elapsed 5.99 s, remaining 0.67 s)
+4600000 of 5000000 tuples (92%) done (elapsed 6.05 s, remaining 0.53 s)
+4700000 of 5000000 tuples (94%) done (elapsed 6.24 s, remaining 0.40 s)
+4800000 of 5000000 tuples (96%) done (elapsed 6.30 s, remaining 0.26 s)
+4900000 of 5000000 tuples (98%) done (elapsed 6.44 s, remaining 0.13 s)
+5000000 of 5000000 tuples (100%) done (elapsed 6.54 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 48.36 s (drop tables 0.00 s, create tables 0.04 s, client-side generate 6.62 s, vacuum 28.33 s, primary keys 13.36 s).
+
+real	0m48.384s
+user	0m0.910s
+sys	0m0.017s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+pgbench (14.3)
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 43633
+latency average = 41.256 ms
+initial connection time = 33.958 ms
+tps = 242.388439 (without initial connection time)
+
+real	3m0.104s
+user	0m2.115s
+sys	0m3.195s
++ pgbench_zfs -o logbias=throughput
++ set -euo pipefail
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE        FSTYPE OPTIONS
+/var/lib/db rpool/root/db zfs    rw,relatime,xattr,posixacl ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs destroy rpool/root/db
++ createDbDataset -o logbias=throughput
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs create -o mountpoint=legacy -o canmount=on -o logbias=throughput rpool/root/db
++ enableDbZfs
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount -t zfs -o x-mount.mkdir rpool/root/db /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.06 s, remaining 2.70 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.18 s, remaining 4.41 s)
+300000 of 5000000 tuples (6%) done (elapsed 0.33 s, remaining 5.14 s)
+400000 of 5000000 tuples (8%) done (elapsed 0.39 s, remaining 4.47 s)
+500000 of 5000000 tuples (10%) done (elapsed 0.52 s, remaining 4.71 s)
+600000 of 5000000 tuples (12%) done (elapsed 0.61 s, remaining 4.48 s)
+700000 of 5000000 tuples (14%) done (elapsed 0.75 s, remaining 4.58 s)
+800000 of 5000000 tuples (16%) done (elapsed 0.81 s, remaining 4.26 s)
+900000 of 5000000 tuples (18%) done (elapsed 1.05 s, remaining 4.77 s)
+1000000 of 5000000 tuples (20%) done (elapsed 1.18 s, remaining 4.74 s)
+1100000 of 5000000 tuples (22%) done (elapsed 1.32 s, remaining 4.66 s)
+1200000 of 5000000 tuples (24%) done (elapsed 1.38 s, remaining 4.37 s)
+1300000 of 5000000 tuples (26%) done (elapsed 1.45 s, remaining 4.13 s)
+1400000 of 5000000 tuples (28%) done (elapsed 1.58 s, remaining 4.06 s)
+1500000 of 5000000 tuples (30%) done (elapsed 1.73 s, remaining 4.04 s)
+1600000 of 5000000 tuples (32%) done (elapsed 1.87 s, remaining 3.98 s)
+1700000 of 5000000 tuples (34%) done (elapsed 1.94 s, remaining 3.76 s)
+1800000 of 5000000 tuples (36%) done (elapsed 2.08 s, remaining 3.70 s)
+1900000 of 5000000 tuples (38%) done (elapsed 2.18 s, remaining 3.55 s)
+2000000 of 5000000 tuples (40%) done (elapsed 2.29 s, remaining 3.43 s)
+2100000 of 5000000 tuples (42%) done (elapsed 2.43 s, remaining 3.36 s)
+2200000 of 5000000 tuples (44%) done (elapsed 2.57 s, remaining 3.27 s)
+2300000 of 5000000 tuples (46%) done (elapsed 2.63 s, remaining 3.08 s)
+2400000 of 5000000 tuples (48%) done (elapsed 2.70 s, remaining 2.92 s)
+2500000 of 5000000 tuples (50%) done (elapsed 2.84 s, remaining 2.84 s)
+2600000 of 5000000 tuples (52%) done (elapsed 2.96 s, remaining 2.73 s)
+2700000 of 5000000 tuples (54%) done (elapsed 3.12 s, remaining 2.65 s)
+2800000 of 5000000 tuples (56%) done (elapsed 3.18 s, remaining 2.49 s)
+2900000 of 5000000 tuples (58%) done (elapsed 3.30 s, remaining 2.39 s)
+3000000 of 5000000 tuples (60%) done (elapsed 3.38 s, remaining 2.25 s)
+3100000 of 5000000 tuples (62%) done (elapsed 3.52 s, remaining 2.16 s)
+3200000 of 5000000 tuples (64%) done (elapsed 3.65 s, remaining 2.05 s)
+3300000 of 5000000 tuples (66%) done (elapsed 3.70 s, remaining 1.91 s)
+3400000 of 5000000 tuples (68%) done (elapsed 3.86 s, remaining 1.82 s)
+3500000 of 5000000 tuples (70%) done (elapsed 4.28 s, remaining 1.84 s)
+3600000 of 5000000 tuples (72%) done (elapsed 4.52 s, remaining 1.76 s)
+3700000 of 5000000 tuples (74%) done (elapsed 4.62 s, remaining 1.62 s)
+3800000 of 5000000 tuples (76%) done (elapsed 4.68 s, remaining 1.48 s)
+3900000 of 5000000 tuples (78%) done (elapsed 4.82 s, remaining 1.36 s)
+4000000 of 5000000 tuples (80%) done (elapsed 4.96 s, remaining 1.24 s)
+4100000 of 5000000 tuples (82%) done (elapsed 5.04 s, remaining 1.11 s)
+4200000 of 5000000 tuples (84%) done (elapsed 5.16 s, remaining 0.98 s)
+4300000 of 5000000 tuples (86%) done (elapsed 5.30 s, remaining 0.86 s)
+4400000 of 5000000 tuples (88%) done (elapsed 5.43 s, remaining 0.74 s)
+4500000 of 5000000 tuples (90%) done (elapsed 5.49 s, remaining 0.61 s)
+4600000 of 5000000 tuples (92%) done (elapsed 5.64 s, remaining 0.49 s)
+4700000 of 5000000 tuples (94%) done (elapsed 5.70 s, remaining 0.36 s)
+4800000 of 5000000 tuples (96%) done (elapsed 5.85 s, remaining 0.24 s)
+4900000 of 5000000 tuples (98%) done (elapsed 5.99 s, remaining 0.12 s)
+5000000 of 5000000 tuples (100%) done (elapsed 6.14 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 14.93 s (drop tables 0.00 s, create tables 0.08 s, client-side generate 6.19 s, vacuum 1.38 s, primary keys 7.28 s).
+
+real	0m14.940s
+user	0m0.896s
+sys	0m0.024s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+pgbench (14.3)
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 43471
+latency average = 41.414 ms
+initial connection time = 8.047 ms
+tps = 241.464579 (without initial connection time)
+
+real	3m0.095s
+user	0m1.846s
+sys	0m2.766s
++ pgbench_zfs -o recordsize=8K -o primarycache=metadata -o logbias=throughput
++ set -euo pipefail
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE        FSTYPE OPTIONS
+/var/lib/db rpool/root/db zfs    rw,relatime,xattr,posixacl ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs destroy rpool/root/db
++ createDbDataset -o recordsize=8K -o primarycache=metadata -o logbias=throughput
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs create -o mountpoint=legacy -o canmount=on -o recordsize=8K -o primarycache=metadata -o logbias=throughput rpool/root/db
++ enableDbZfs
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount -t zfs -o x-mount.mkdir rpool/root/db /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.06 s, remaining 2.78 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.30 s, remaining 7.18 s)
+300000 of 5000000 tuples (6%) done (elapsed 0.57 s, remaining 8.91 s)
+400000 of 5000000 tuples (8%) done (elapsed 0.74 s, remaining 8.50 s)
+500000 of 5000000 tuples (10%) done (elapsed 0.80 s, remaining 7.22 s)
+600000 of 5000000 tuples (12%) done (elapsed 1.03 s, remaining 7.57 s)
+700000 of 5000000 tuples (14%) done (elapsed 1.30 s, remaining 8.01 s)
+800000 of 5000000 tuples (16%) done (elapsed 1.55 s, remaining 8.12 s)
+900000 of 5000000 tuples (18%) done (elapsed 1.61 s, remaining 7.32 s)
+1000000 of 5000000 tuples (20%) done (elapsed 1.85 s, remaining 7.41 s)
+1100000 of 5000000 tuples (22%) done (elapsed 2.00 s, remaining 7.10 s)
+1200000 of 5000000 tuples (24%) done (elapsed 2.21 s, remaining 7.00 s)
+1300000 of 5000000 tuples (26%) done (elapsed 2.28 s, remaining 6.49 s)
+1400000 of 5000000 tuples (28%) done (elapsed 2.47 s, remaining 6.35 s)
+1500000 of 5000000 tuples (30%) done (elapsed 2.71 s, remaining 6.31 s)
+1600000 of 5000000 tuples (32%) done (elapsed 2.77 s, remaining 5.89 s)
+1700000 of 5000000 tuples (34%) done (elapsed 3.00 s, remaining 5.83 s)
+1800000 of 5000000 tuples (36%) done (elapsed 3.23 s, remaining 5.74 s)
+1900000 of 5000000 tuples (38%) done (elapsed 3.49 s, remaining 5.69 s)
+2000000 of 5000000 tuples (40%) done (elapsed 3.55 s, remaining 5.32 s)
+2100000 of 5000000 tuples (42%) done (elapsed 3.77 s, remaining 5.21 s)
+2200000 of 5000000 tuples (44%) done (elapsed 3.99 s, remaining 5.08 s)
+2300000 of 5000000 tuples (46%) done (elapsed 4.16 s, remaining 4.88 s)
+2400000 of 5000000 tuples (48%) done (elapsed 4.22 s, remaining 4.58 s)
+2500000 of 5000000 tuples (50%) done (elapsed 4.44 s, remaining 4.44 s)
+2600000 of 5000000 tuples (52%) done (elapsed 4.66 s, remaining 4.30 s)
+2700000 of 5000000 tuples (54%) done (elapsed 4.91 s, remaining 4.19 s)
+2800000 of 5000000 tuples (56%) done (elapsed 5.36 s, remaining 4.22 s)
+2900000 of 5000000 tuples (58%) done (elapsed 5.44 s, remaining 3.94 s)
+3000000 of 5000000 tuples (60%) done (elapsed 5.84 s, remaining 3.89 s)
+3100000 of 5000000 tuples (62%) done (elapsed 6.07 s, remaining 3.72 s)
+3200000 of 5000000 tuples (64%) done (elapsed 6.54 s, remaining 3.68 s)
+3300000 of 5000000 tuples (66%) done (elapsed 7.08 s, remaining 3.64 s)
+3400000 of 5000000 tuples (68%) done (elapsed 7.14 s, remaining 3.36 s)
+3500000 of 5000000 tuples (70%) done (elapsed 7.57 s, remaining 3.24 s)
+3600000 of 5000000 tuples (72%) done (elapsed 7.93 s, remaining 3.08 s)
+3700000 of 5000000 tuples (74%) done (elapsed 8.13 s, remaining 2.86 s)
+3800000 of 5000000 tuples (76%) done (elapsed 8.56 s, remaining 2.70 s)
+3900000 of 5000000 tuples (78%) done (elapsed 8.62 s, remaining 2.43 s)
+4000000 of 5000000 tuples (80%) done (elapsed 9.02 s, remaining 2.26 s)
+4100000 of 5000000 tuples (82%) done (elapsed 9.29 s, remaining 2.04 s)
+4200000 of 5000000 tuples (84%) done (elapsed 9.46 s, remaining 1.80 s)
+4300000 of 5000000 tuples (86%) done (elapsed 9.65 s, remaining 1.57 s)
+4400000 of 5000000 tuples (88%) done (elapsed 9.72 s, remaining 1.33 s)
+4500000 of 5000000 tuples (90%) done (elapsed 9.90 s, remaining 1.10 s)
+4600000 of 5000000 tuples (92%) done (elapsed 10.12 s, remaining 0.88 s)
+4700000 of 5000000 tuples (94%) done (elapsed 10.23 s, remaining 0.65 s)
+4800000 of 5000000 tuples (96%) done (elapsed 10.96 s, remaining 0.46 s)
+4900000 of 5000000 tuples (98%) done (elapsed 11.48 s, remaining 0.23 s)
+5000000 of 5000000 tuples (100%) done (elapsed 11.55 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 39.78 s (drop tables 0.00 s, create tables 0.07 s, client-side generate 12.12 s, vacuum 18.88 s, primary keys 8.70 s).
+
+real	0m39.786s
+user	0m0.996s
+sys	0m0.026s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+pgbench (14.3)
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 32390
+latency average = 55.585 ms
+initial connection time = 17.619 ms
+tps = 179.906266 (without initial connection time)
+
+real	3m0.188s
+user	0m1.693s
+sys	0m2.528s
++ pgbench_btrfs_mirror_compression_zstd
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE        FSTYPE OPTIONS
+/var/lib/db rpool/root/db zfs    rw,relatime,xattr,posixacl ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db
++ mkfs.btrfs -f -d raid1 -m raid1 -L btrfs /dev/sda4 /dev/sdb4
+btrfs-progs v5.18
+See http://btrfs.wiki.kernel.org for more information.
+
+NOTE: several default settings have changed in version 5.15, please make sure
+      this does not affect your deployments:
+      - DUP for metadata (-m dup)
+      - enabled no-holes (-O no-holes)
+      - enabled free-space-tree (-R free-space-tree)
+
+Label:              btrfs
+UUID:               de75e887-535b-4385-af77-34957223c071
+Node size:          16384
+Sector size:        4096
+Filesystem size:    400.00GiB
+Block group profiles:
+  Data:             RAID1             1.00GiB
+  Metadata:         RAID1             1.00GiB
+  System:           RAID1             8.00MiB
+SSD detected:       no
+Zoned device:       no
+Incompat features:  extref, skinny-metadata, no-holes
+Runtime features:   free-space-tree
+Checksum:           crc32c
+Number of devices:  2
+Devices:
+   ID        SIZE  PATH
+    1   200.00GiB  /dev/sda4
+    2   200.00GiB  /dev/sdb4
+
++ pgbench_btrfs
++ set -euo pipefail
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
+db mount is already disabled
++ [[ ! -n '' ]]
++ echo 'db mount is already disabled'
++ return
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ zfs destroy rpool/root/db
++ enableDbBtrfs
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount -t btrfs -o compress=zstd /dev/disk/by-label/btrfs /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.05 s, remaining 2.57 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.15 s, remaining 3.57 s)
+300000 of 5000000 tuples (6%) done (elapsed 0.34 s, remaining 5.30 s)
+400000 of 5000000 tuples (8%) done (elapsed 0.51 s, remaining 5.83 s)
+500000 of 5000000 tuples (10%) done (elapsed 0.56 s, remaining 5.08 s)
+600000 of 5000000 tuples (12%) done (elapsed 0.76 s, remaining 5.55 s)
+700000 of 5000000 tuples (14%) done (elapsed 0.98 s, remaining 6.00 s)
+800000 of 5000000 tuples (16%) done (elapsed 1.03 s, remaining 5.41 s)
+900000 of 5000000 tuples (18%) done (elapsed 1.22 s, remaining 5.57 s)
+1000000 of 5000000 tuples (20%) done (elapsed 1.46 s, remaining 5.84 s)
+1100000 of 5000000 tuples (22%) done (elapsed 1.66 s, remaining 5.87 s)
+1200000 of 5000000 tuples (24%) done (elapsed 1.75 s, remaining 5.55 s)
+1300000 of 5000000 tuples (26%) done (elapsed 1.81 s, remaining 5.14 s)
+1400000 of 5000000 tuples (28%) done (elapsed 2.03 s, remaining 5.21 s)
+1500000 of 5000000 tuples (30%) done (elapsed 2.22 s, remaining 5.17 s)
+1600000 of 5000000 tuples (32%) done (elapsed 2.42 s, remaining 5.13 s)
+1700000 of 5000000 tuples (34%) done (elapsed 2.61 s, remaining 5.06 s)
+1800000 of 5000000 tuples (36%) done (elapsed 2.67 s, remaining 4.74 s)
+1900000 of 5000000 tuples (38%) done (elapsed 2.78 s, remaining 4.53 s)
+2000000 of 5000000 tuples (40%) done (elapsed 3.00 s, remaining 4.49 s)
+2100000 of 5000000 tuples (42%) done (elapsed 3.22 s, remaining 4.45 s)
+2200000 of 5000000 tuples (44%) done (elapsed 3.43 s, remaining 4.37 s)
+2300000 of 5000000 tuples (46%) done (elapsed 3.49 s, remaining 4.09 s)
+2400000 of 5000000 tuples (48%) done (elapsed 3.68 s, remaining 3.98 s)
+2500000 of 5000000 tuples (50%) done (elapsed 3.78 s, remaining 3.78 s)
+2600000 of 5000000 tuples (52%) done (elapsed 3.99 s, remaining 3.68 s)
+2700000 of 5000000 tuples (54%) done (elapsed 4.20 s, remaining 3.58 s)
+2800000 of 5000000 tuples (56%) done (elapsed 4.27 s, remaining 3.36 s)
+2900000 of 5000000 tuples (58%) done (elapsed 4.48 s, remaining 3.24 s)
+3000000 of 5000000 tuples (60%) done (elapsed 4.71 s, remaining 3.14 s)
+3100000 of 5000000 tuples (62%) done (elapsed 4.83 s, remaining 2.96 s)
+3200000 of 5000000 tuples (64%) done (elapsed 5.05 s, remaining 2.84 s)
+3300000 of 5000000 tuples (66%) done (elapsed 5.10 s, remaining 2.63 s)
+3400000 of 5000000 tuples (68%) done (elapsed 5.31 s, remaining 2.50 s)
+3500000 of 5000000 tuples (70%) done (elapsed 5.53 s, remaining 2.37 s)
+3600000 of 5000000 tuples (72%) done (elapsed 5.74 s, remaining 2.23 s)
+3700000 of 5000000 tuples (74%) done (elapsed 5.86 s, remaining 2.06 s)
+3800000 of 5000000 tuples (76%) done (elapsed 5.93 s, remaining 1.87 s)
+3900000 of 5000000 tuples (78%) done (elapsed 6.10 s, remaining 1.72 s)
+4000000 of 5000000 tuples (80%) done (elapsed 6.32 s, remaining 1.58 s)
+4100000 of 5000000 tuples (82%) done (elapsed 6.54 s, remaining 1.44 s)
+4200000 of 5000000 tuples (84%) done (elapsed 6.75 s, remaining 1.29 s)
+4300000 of 5000000 tuples (86%) done (elapsed 6.80 s, remaining 1.11 s)
+4400000 of 5000000 tuples (88%) done (elapsed 6.92 s, remaining 0.94 s)
+4500000 of 5000000 tuples (90%) done (elapsed 7.15 s, remaining 0.79 s)
+4600000 of 5000000 tuples (92%) done (elapsed 7.45 s, remaining 0.65 s)
+4700000 of 5000000 tuples (94%) done (elapsed 7.51 s, remaining 0.48 s)
+4800000 of 5000000 tuples (96%) done (elapsed 7.75 s, remaining 0.32 s)
+4900000 of 5000000 tuples (98%) done (elapsed 7.95 s, remaining 0.16 s)
+5000000 of 5000000 tuples (100%) done (elapsed 8.18 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 11.71 s (drop tables 0.00 s, create tables 0.08 s, client-side generate 8.25 s, vacuum 0.84 s, primary keys 2.54 s).
+
+real	0m11.723s
+user	0m1.095s
+sys	0m0.019s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+pgbench (14.3)
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 33739
+latency average = 53.362 ms
+initial connection time = 7.783 ms
+tps = 187.399639 (without initial connection time)
+
+real	3m0.126s
+user	0m1.456s
+sys	0m2.252s
++ pgbench_btrfs_striped_compression_zstd
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE    FSTYPE OPTIONS
+/var/lib/db /dev/sda4 btrfs  rw,relatime,compress=zstd:3,space_cache=v2,subvolid=5,subvol=/ ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db
++ mkfs.btrfs -f -d raid0 -m raid1 -L btrfs /dev/sda4 /dev/sdb4
+btrfs-progs v5.18
+See http://btrfs.wiki.kernel.org for more information.
+
+NOTE: several default settings have changed in version 5.15, please make sure
+      this does not affect your deployments:
+      - DUP for metadata (-m dup)
+      - enabled no-holes (-O no-holes)
+      - enabled free-space-tree (-R free-space-tree)
+
+Label:              btrfs
+UUID:               f3d80027-8733-45c7-a21e-1ccb97958fee
+Node size:          16384
+Sector size:        4096
+Filesystem size:    400.00GiB
+Block group profiles:
+  Data:             RAID0             2.00GiB
+  Metadata:         RAID1             1.00GiB
+  System:           RAID1             8.00MiB
+SSD detected:       no
+Zoned device:       no
+Incompat features:  extref, skinny-metadata, no-holes
+Runtime features:   free-space-tree
+Checksum:           crc32c
+Number of devices:  2
+Devices:
+   ID        SIZE  PATH
+    1   200.00GiB  /dev/sda4
+    2   200.00GiB  /dev/sdb4
+
++ pgbench_btrfs
++ set -euo pipefail
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
+db mount is already disabled
++ [[ ! -n '' ]]
++ echo 'db mount is already disabled'
++ return
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ enableDbBtrfs
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount -t btrfs -o compress=zstd /dev/disk/by-label/btrfs /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.05 s, remaining 2.57 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.25 s, remaining 5.96 s)
+300000 of 5000000 tuples (6%) done (elapsed 0.48 s, remaining 7.54 s)
+400000 of 5000000 tuples (8%) done (elapsed 0.57 s, remaining 6.58 s)
+500000 of 5000000 tuples (10%) done (elapsed 0.64 s, remaining 5.74 s)
+600000 of 5000000 tuples (12%) done (elapsed 0.81 s, remaining 5.95 s)
+700000 of 5000000 tuples (14%) done (elapsed 1.00 s, remaining 6.17 s)
+800000 of 5000000 tuples (16%) done (elapsed 1.21 s, remaining 6.33 s)
+900000 of 5000000 tuples (18%) done (elapsed 1.44 s, remaining 6.57 s)
+1000000 of 5000000 tuples (20%) done (elapsed 1.50 s, remaining 6.00 s)
+1100000 of 5000000 tuples (22%) done (elapsed 1.59 s, remaining 5.65 s)
+1200000 of 5000000 tuples (24%) done (elapsed 1.78 s, remaining 5.64 s)
+1300000 of 5000000 tuples (26%) done (elapsed 1.98 s, remaining 5.64 s)
+1400000 of 5000000 tuples (28%) done (elapsed 2.17 s, remaining 5.58 s)
+1500000 of 5000000 tuples (30%) done (elapsed 2.23 s, remaining 5.19 s)
+1600000 of 5000000 tuples (32%) done (elapsed 2.40 s, remaining 5.11 s)
+1700000 of 5000000 tuples (34%) done (elapsed 2.59 s, remaining 5.03 s)
+1800000 of 5000000 tuples (36%) done (elapsed 2.65 s, remaining 4.70 s)
+1900000 of 5000000 tuples (38%) done (elapsed 2.82 s, remaining 4.61 s)
+2000000 of 5000000 tuples (40%) done (elapsed 2.88 s, remaining 4.32 s)
+2100000 of 5000000 tuples (42%) done (elapsed 3.08 s, remaining 4.25 s)
+2200000 of 5000000 tuples (44%) done (elapsed 3.14 s, remaining 3.99 s)
+2300000 of 5000000 tuples (46%) done (elapsed 3.33 s, remaining 3.91 s)
+2400000 of 5000000 tuples (48%) done (elapsed 3.52 s, remaining 3.82 s)
+2500000 of 5000000 tuples (50%) done (elapsed 3.58 s, remaining 3.58 s)
+2600000 of 5000000 tuples (52%) done (elapsed 3.79 s, remaining 3.50 s)
+2700000 of 5000000 tuples (54%) done (elapsed 4.03 s, remaining 3.43 s)
+2800000 of 5000000 tuples (56%) done (elapsed 4.24 s, remaining 3.34 s)
+2900000 of 5000000 tuples (58%) done (elapsed 4.32 s, remaining 3.13 s)
+3000000 of 5000000 tuples (60%) done (elapsed 4.53 s, remaining 3.02 s)
+3100000 of 5000000 tuples (62%) done (elapsed 4.63 s, remaining 2.84 s)
+3200000 of 5000000 tuples (64%) done (elapsed 4.84 s, remaining 2.72 s)
+3300000 of 5000000 tuples (66%) done (elapsed 5.07 s, remaining 2.61 s)
+3400000 of 5000000 tuples (68%) done (elapsed 5.13 s, remaining 2.41 s)
+3500000 of 5000000 tuples (70%) done (elapsed 5.32 s, remaining 2.28 s)
+3600000 of 5000000 tuples (72%) done (elapsed 5.51 s, remaining 2.14 s)
+3700000 of 5000000 tuples (74%) done (elapsed 5.61 s, remaining 1.97 s)
+3800000 of 5000000 tuples (76%) done (elapsed 5.71 s, remaining 1.80 s)
+3900000 of 5000000 tuples (78%) done (elapsed 5.89 s, remaining 1.66 s)
+4000000 of 5000000 tuples (80%) done (elapsed 6.08 s, remaining 1.52 s)
+4100000 of 5000000 tuples (82%) done (elapsed 6.29 s, remaining 1.38 s)
+4200000 of 5000000 tuples (84%) done (elapsed 6.34 s, remaining 1.21 s)
+4300000 of 5000000 tuples (86%) done (elapsed 6.57 s, remaining 1.07 s)
+4400000 of 5000000 tuples (88%) done (elapsed 6.76 s, remaining 0.92 s)
+4500000 of 5000000 tuples (90%) done (elapsed 6.96 s, remaining 0.77 s)
+4600000 of 5000000 tuples (92%) done (elapsed 7.01 s, remaining 0.61 s)
+4700000 of 5000000 tuples (94%) done (elapsed 7.12 s, remaining 0.45 s)
+4800000 of 5000000 tuples (96%) done (elapsed 7.33 s, remaining 0.31 s)
+4900000 of 5000000 tuples (98%) done (elapsed 7.53 s, remaining 0.15 s)
+5000000 of 5000000 tuples (100%) done (elapsed 7.72 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 11.10 s (drop tables 0.00 s, create tables 0.10 s, client-side generate 7.77 s, vacuum 0.84 s, primary keys 2.38 s).
+
+real	0m11.108s
+user	0m0.968s
+sys	0m0.024s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+pgbench (14.3)
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 37270
+latency average = 48.312 ms
+initial connection time = 7.974 ms
+tps = 206.987262 (without initial connection time)
+
+real	3m0.123s
+user	0m1.552s
+sys	0m2.462s
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE    FSTYPE OPTIONS
+/var/lib/db /dev/sda4 btrfs  rw,relatime,compress=zstd:3,space_cache=v2,subvolid=5,subvol=/ ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db
++ mkfs.ext4 -F -L ext4 /dev/sda5
+mke2fs 1.46.5 (30-Dec-2021)
+Creating filesystem with 52428800 4k blocks and 13107200 inodes
+Filesystem UUID: 93fbb871-19f1-427e-90ee-26e2ee41d655
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376, 294912, 819200, 884736, 1605632, 2654208, 
+	4096000, 7962624, 11239424, 20480000, 23887872
+
+Allocating group tables:    0/1600         done                            
+Writing inode tables:    0/1600         done                            
+Creating journal (262144 blocks): done
+Writing superblocks and filesystem accounting information:    0/1600         done
+
++ sleep 0.5
++ pgbench_ext4
++ set -euo pipefail
++ disableDbMount
+db mount is already disabled
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n '' ]]
++ echo 'db mount is already disabled'
++ return
++ destroyDbDataset
++ dbDatasetExists
++ zfs get type rpool/root/db
++ enableDbExt4
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ -n '' ]]
++ set -x
++ mount /dev/disk/by-label/ext4 /var/lib/db
++ systemctl stop postgresql
++ mkdir -p /var/lib/db/postgresql /var/lib/postgresql
++ chown postgres: /var/lib/db/postgresql /var/lib/postgresql
++ mount --bind /var/lib/db/postgresql /var/lib/postgresql
++ run_pgbench
++ set -euxo pipefail
++ resetPostgresql
++ set -euo pipefail
++ systemctl stop postgresql
++ rm -rf '/var/lib/postgresql/*'
++ systemctl start postgresql
++ echo 'CREATE DATABASE "bench" WITH OWNER "matrix-synapse" TEMPLATE template0 LC_COLLATE = "C" LC_CTYPE = "C";'
++ sudo -u postgres psql
+CREATE DATABASE
++ sudo -u postgres pgbench --initialize --scale=50 bench
+dropping old tables...
+NOTICE:  table "pgbench_accounts" does not exist, skipping
+NOTICE:  table "pgbench_branches" does not exist, skipping
+NOTICE:  table "pgbench_history" does not exist, skipping
+NOTICE:  table "pgbench_tellers" does not exist, skipping
+creating tables...
+generating data (client-side)...
+100000 of 5000000 tuples (2%) done (elapsed 0.05 s, remaining 2.66 s)
+200000 of 5000000 tuples (4%) done (elapsed 0.38 s, remaining 9.10 s)
+300000 of 5000000 tuples (6%) done (elapsed 0.70 s, remaining 10.96 s)
+400000 of 5000000 tuples (8%) done (elapsed 0.86 s, remaining 9.89 s)
+500000 of 5000000 tuples (10%) done (elapsed 0.92 s, remaining 8.24 s)
+600000 of 5000000 tuples (12%) done (elapsed 1.22 s, remaining 8.97 s)
+700000 of 5000000 tuples (14%) done (elapsed 1.57 s, remaining 9.62 s)
+800000 of 5000000 tuples (16%) done (elapsed 1.89 s, remaining 9.92 s)
+900000 of 5000000 tuples (18%) done (elapsed 1.94 s, remaining 8.83 s)
+1000000 of 5000000 tuples (20%) done (elapsed 2.31 s, remaining 9.22 s)
+1100000 of 5000000 tuples (22%) done (elapsed 2.48 s, remaining 8.78 s)
+1200000 of 5000000 tuples (24%) done (elapsed 2.80 s, remaining 8.86 s)
+1300000 of 5000000 tuples (26%) done (elapsed 3.12 s, remaining 8.88 s)
+1400000 of 5000000 tuples (28%) done (elapsed 3.17 s, remaining 8.16 s)
+1500000 of 5000000 tuples (30%) done (elapsed 3.49 s, remaining 8.13 s)
+1600000 of 5000000 tuples (32%) done (elapsed 3.82 s, remaining 8.11 s)
+1700000 of 5000000 tuples (34%) done (elapsed 3.98 s, remaining 7.73 s)
+1800000 of 5000000 tuples (36%) done (elapsed 4.29 s, remaining 7.62 s)
+1900000 of 5000000 tuples (38%) done (elapsed 4.34 s, remaining 7.09 s)
+2000000 of 5000000 tuples (40%) done (elapsed 4.67 s, remaining 7.00 s)
+2100000 of 5000000 tuples (42%) done (elapsed 5.01 s, remaining 6.92 s)
+2200000 of 5000000 tuples (44%) done (elapsed 5.32 s, remaining 6.78 s)
+2300000 of 5000000 tuples (46%) done (elapsed 5.51 s, remaining 6.47 s)
+2400000 of 5000000 tuples (48%) done (elapsed 5.56 s, remaining 6.03 s)
+2500000 of 5000000 tuples (50%) done (elapsed 5.88 s, remaining 5.88 s)
+2600000 of 5000000 tuples (52%) done (elapsed 6.19 s, remaining 5.72 s)
+2700000 of 5000000 tuples (54%) done (elapsed 6.54 s, remaining 5.57 s)
+2800000 of 5000000 tuples (56%) done (elapsed 6.87 s, remaining 5.40 s)
+2900000 of 5000000 tuples (58%) done (elapsed 6.92 s, remaining 5.01 s)
+3000000 of 5000000 tuples (60%) done (elapsed 7.09 s, remaining 4.73 s)
+3100000 of 5000000 tuples (62%) done (elapsed 7.39 s, remaining 4.53 s)
+3200000 of 5000000 tuples (64%) done (elapsed 7.72 s, remaining 4.34 s)
+3300000 of 5000000 tuples (66%) done (elapsed 8.03 s, remaining 4.14 s)
+3400000 of 5000000 tuples (68%) done (elapsed 8.09 s, remaining 3.81 s)
+3500000 of 5000000 tuples (70%) done (elapsed 8.43 s, remaining 3.61 s)
+3600000 of 5000000 tuples (72%) done (elapsed 8.60 s, remaining 3.34 s)
+3700000 of 5000000 tuples (74%) done (elapsed 8.90 s, remaining 3.13 s)
+3800000 of 5000000 tuples (76%) done (elapsed 9.21 s, remaining 2.91 s)
+3900000 of 5000000 tuples (78%) done (elapsed 9.27 s, remaining 2.61 s)
+4000000 of 5000000 tuples (80%) done (elapsed 9.60 s, remaining 2.40 s)
+4100000 of 5000000 tuples (82%) done (elapsed 9.92 s, remaining 2.18 s)
+4200000 of 5000000 tuples (84%) done (elapsed 10.09 s, remaining 1.92 s)
+4300000 of 5000000 tuples (86%) done (elapsed 10.41 s, remaining 1.69 s)
+4400000 of 5000000 tuples (88%) done (elapsed 10.47 s, remaining 1.43 s)
+4500000 of 5000000 tuples (90%) done (elapsed 10.80 s, remaining 1.20 s)
+4600000 of 5000000 tuples (92%) done (elapsed 11.13 s, remaining 0.97 s)
+4700000 of 5000000 tuples (94%) done (elapsed 11.47 s, remaining 0.73 s)
+4800000 of 5000000 tuples (96%) done (elapsed 11.64 s, remaining 0.49 s)
+4900000 of 5000000 tuples (98%) done (elapsed 11.69 s, remaining 0.24 s)
+5000000 of 5000000 tuples (100%) done (elapsed 12.00 s, remaining 0.00 s)
+vacuuming...
+creating primary keys...
+done in 17.03 s (drop tables 0.00 s, create tables 0.04 s, client-side generate 12.32 s, vacuum 0.75 s, primary keys 3.92 s).
+
+real	0m17.042s
+user	0m0.882s
+sys	0m0.028s
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=1 bench
+starting vacuum...end.
+pgbench (14.3)
++ durationMinutes=3
++ sudo -u postgres pgbench --client=10 --jobs=2 --time=180 bench
+starting vacuum...end.
+transaction type: <builtin: TPC-B (sort of)>
+scaling factor: 50
+query mode: simple
+number of clients: 10
+number of threads: 2
+duration: 180 s
+number of transactions actually processed: 86533
+latency average = 20.805 ms
+initial connection time = 7.643 ms
+tps = 480.663844 (without initial connection time)
+
+real	3m0.097s
+user	0m3.690s
+sys	0m5.714s
++ disableDbMount
++ set -euo pipefail
+++ findmnt /var/lib/db
++ [[ ! -n TARGET      SOURCE    FSTYPE OPTIONS
+/var/lib/db /dev/sda5 ext4   rw,relatime ]]
++ set -x
++ systemctl stop postgresql
++ umount /var/lib/postgresql
++ umount /var/lib/db

@@ -1,0 +1,147 @@
+<h2>postgresql 11, shared_buffers: default (128 MiB) [the current setup on nixbitcoin.org]</h2>
+<table>
+  <tr>
+    <th>task</th>
+    <th>Transactions per Second</th>
+    <th>Average Latency (ms)</th>
+  </tr>
+  <tr>
+  <td>pgbench_zfs</td>
+  <td>429.76</td>
+  <td>23.27</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o recordsize=8K</td>
+  <td>399.11</td>
+  <td>25.06</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o logbias=throughput</td>
+  <td>227.3</td>
+  <td>44.0</td>
+</tr>
+<tr>
+  <td>pgbench_btrfs_striped_compression_zstd</td>
+  <td>199.03</td>
+  <td>50.24</td>
+</tr>
+<tr>
+  <td>pgbench_btrfs_mirror_compression_zstd</td>
+  <td>178.16</td>
+  <td>56.13</td>
+</tr>
+<tr>
+  <td>pgbench_ext4</td>
+  <td>158.92</td>
+  <td>62.92</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o recordsize=8K -o primarycache=metadata -o logbias=throughput</td>
+  <td>94.35</td>
+  <td>105.99</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o primarycache=metadata</td>
+  <td>85.17</td>
+  <td>117.42</td>
+</tr>
+
+</table>
+<h2>postgresql 11, shared_buffers: 8 GiB</h2>
+<table>
+  <tr>
+    <th>task</th>
+    <th>Transactions per Second</th>
+    <th>Average Latency (ms)</th>
+  </tr>
+  <tr>
+  <td>pgbench_zfs</td>
+  <td>497.21</td>
+  <td>20.11</td>
+</tr>
+<tr>
+  <td>pgbench_ext4</td>
+  <td>492.01</td>
+  <td>20.33</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o recordsize=8K</td>
+  <td>488.11</td>
+  <td>20.49</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o primarycache=metadata</td>
+  <td>402.74</td>
+  <td>24.83</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o logbias=throughput</td>
+  <td>243.3</td>
+  <td>41.1</td>
+</tr>
+<tr>
+  <td>pgbench_btrfs_striped_compression_zstd</td>
+  <td>213.73</td>
+  <td>46.79</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o recordsize=8K -o primarycache=metadata -o logbias=throughput</td>
+  <td>198.24</td>
+  <td>50.45</td>
+</tr>
+<tr>
+  <td>pgbench_btrfs_mirror_compression_zstd</td>
+  <td>193.65</td>
+  <td>51.64</td>
+</tr>
+
+</table>
+<h2>postgresql 14, shared_buffers: 8 GiB</h2>
+<table>
+  <tr>
+    <th>task</th>
+    <th>Transactions per Second</th>
+    <th>Average Latency (ms)</th>
+  </tr>
+  <tr>
+  <td>pgbench_ext4</td>
+  <td>480.66</td>
+  <td>20.81</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o recordsize=8K</td>
+  <td>430.83</td>
+  <td>23.21</td>
+</tr>
+<tr>
+  <td>pgbench_zfs</td>
+  <td>288.93</td>
+  <td>34.61</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o primarycache=metadata</td>
+  <td>242.39</td>
+  <td>41.26</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o logbias=throughput</td>
+  <td>241.46</td>
+  <td>41.41</td>
+</tr>
+<tr>
+  <td>pgbench_btrfs_striped_compression_zstd</td>
+  <td>206.99</td>
+  <td>48.31</td>
+</tr>
+<tr>
+  <td>pgbench_btrfs_mirror_compression_zstd</td>
+  <td>187.4</td>
+  <td>53.36</td>
+</tr>
+<tr>
+  <td>pgbench_zfs -o recordsize=8K -o primarycache=metadata -o logbias=throughput</td>
+  <td>179.91</td>
+  <td>55.59</td>
+</tr>
+
+</table>
