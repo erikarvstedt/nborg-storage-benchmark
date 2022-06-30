@@ -16,7 +16,7 @@ with lib;
   documentation.nixos.enable = mkOverride 0 false;
   documentation.enable = mkOverride 0 false;
 
-  services.openssh.hostKeys = [
+  services.openssh.hostKeys = lib.mkForce [
     {
       path = "/run/keys/ssh-host-key";
       type = "ed25519";

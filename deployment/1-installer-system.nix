@@ -12,7 +12,6 @@ in {
 
   environment.systemPackages = with pkgs; [
     gptfdisk
-    zfs
   ];
 
   services.openssh = {
@@ -25,6 +24,8 @@ in {
     openssh.authorizedKeys.keys = base.openssh.authorizedKeys.keys;
     hashedPassword = base.hashedPassword;
   };
+
+  services.logind.killUserProcesses = true;
 
   system.stateVersion = config.system.nixos.release;
 }
