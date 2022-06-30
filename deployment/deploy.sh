@@ -35,7 +35,7 @@ runBuild
 source ./deployment-lib.sh
 
 # FIXME: Set this to the server address
-hostAddress=95.217.114.239
+hostAddress=148.251.83.15
 # Remove old entry from ~/.ssh/known_hosts
 ssh-keygen -R $hostAddress
 
