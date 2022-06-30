@@ -6,7 +6,11 @@ copyKexec() {(
     fi
 
     echo "install kexec"
-    ssh nborg-installer "DEBIAN_FRONTEND=noninteractive apt-get -y install kexec-tools"
+    ssh nborg-installer "
+      if ! type -P kexec >/dev/null; then
+        DEBIAN_FRONTEND=noninteractive apt-get -y install kexec-tools
+      fi
+    "
 
     echo "build installer system"
     nix build .#packages.x86_64-linux.installerSystemKexec --out-link /tmp/deploy-nixbitcoinorg/kexec
